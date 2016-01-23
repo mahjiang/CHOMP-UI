@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CHOMP</title>
+ 
+    
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/signup.css" rel="stylesheet">
+    
+  </head>
+ 
+  <body>
+ 
+    <div class="container">
+      <div class="header">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation" ><a href="main">Home</a></li>
+            <li role="presentation"><a href="#">Sign In</a></li>
+            <li role="presentation" class="active"><a href="#">Sign Up</a></li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">CHOMP</h3>
+      </div>
+ 
+      <div class="jumbotron">
+        <h1>CHOMP</h1>
+        <form class="form-signin">
+        <label for="inputName" class="sr-only">Name</label>
+        <input type="name" name="inputName" id="inputName" class="form-control" placeholder="Full Foodtruck Name" required autofocus>
+        <label for="inputEmail" class="sr-only">Phone Number (associated with Venmo)</label>
+        <input type="phone" name="inputPhone" id="inputPhone" class="form-control" placeholder="xxx-xxx-xxxx" required autofocus>
+        <label for="inputHandle" class="sr-only">Handle</label>
+        <input type="handle" name="inputHandle" id="inputHandle" class="form-control" placeholder="@handle" required autofocus>
+        <label for="inputEmail" class="sr-only">Location</label>
+        <input type="location" name="inputLocation" id="inputLocation" class="form-control" placeholder="e.g. 38th and Spruce St" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" required>
+         
+        <button id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="button">Sign up</button>
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+      </form>
+      </div>
+ 
+       
+ 
+      <footer class="footer">
+        <p>&copy; CHOMP 2016</p>
+      </footer>
+ 
+    </div>
+    <script>$(function() {
+    $('#btnSignUp').click(function() {
+ 
+        $.ajax({
+            url: '/signUp',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+  });</script>
+  </body>
+</html>
