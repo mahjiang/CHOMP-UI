@@ -116,17 +116,5 @@ def menu():
     else:
         return render_template('error.html',error = 'Unauthorized Access')
 
-@app.route('/editMenu')
-def menuChange():
-	if session.get('user'):
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        thisId = session['user']
-        query = ("SELECT * FROM food WHERE vendor_id=1")
-        cursor.execute(query)
-        fields=cursor.fetchall()
-        return render_template('editMenu.html',fields=fields)
-    else:
-        return render_template('error.html',error = 'Unauthorized Access')
 
 
