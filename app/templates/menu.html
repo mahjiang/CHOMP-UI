@@ -16,13 +16,14 @@
 </head>
 
 <script>
-var fields = <%= fields %>;
-for (int i = 0; i < fields.length; i++) {
-    console.log(fields[i])
+function get_fields(f) {
+    for (int i = 0; i < fields.length; i++) {
+        console.log(fields[i])
+    }
 }
 </script>
  
-<body>
+<body onload="get_fields({{ fields }})">
  
     <div class="container">
         <div class="header">
