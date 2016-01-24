@@ -1,7 +1,6 @@
-from flask import Flask,render_template
+from flask import Flask
 #from app import app
 from flask.ext.mysql import MySQL
-from werkzeug import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -18,42 +17,16 @@ app.config['MYSQL_DATABASE_DB'] = db_params['db']
 app.config['MYSQL_DATABASE_HOST'] = db_params['host']
 mysql.init_app(app)
 
-@app.route('/')
-@app.route('/index')
-def index():
-    user = {'nickname': 'Miguel'}  # fake user
-    posts = [  # fake array of posts
-        { 
-            'author': {'nickname': 'John'}, 
-            'body': 'Beautiful day in Portland!' 
-        },
-        { 
-            'author': {'nickname': 'Susan'}, 
-            'body': 'The Avengers movie was so cool!' 
-        }
-    ]
-    return render_template("index.html",
-                           title='Home',
-                           user=user,
-                           posts=posts)
-
-from flask import Flask, render_template, flash, redirect, request, json
+from flask import render_template, flash, redirect, request, json, session
 from app import app
 from .forms import LoginForm
+from werkzeug import generate_password_hash, check_password_hash
 
-# index view function suppressed for brevity
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for OpenID="%s", remember_me=%s' %
-              (form.openid.data, str(form.remember_me.data)))
-        return redirect('/index')
-    return render_template('login.html', 
-                           title='Sign In',
-                           form=form,
-                           providers=app.config['OPENID_PROVIDERS'])
+@app.route('/')
+@app.route('/index')
+def main():
+    return render_template("index.html")
 
 @app.route('/showSignUp')
 def showSignUp():
@@ -74,13 +47,86 @@ def signUp():
 		conn = mysql.connect()
 		cursor = conn.cursor()
 		_hashed_password = generate_password_hash(_password)
-		cursor.callproc('sp_createUser',(_phone,_name,_location,_handle,_hashed_password))
+		cursor.callproc('sp_createUser',(_phone,_name,_location,_handle,_password))
 		data = cursor.fetchall()
 		if len(data) is 0:
 			conn.commit()
-			return json.dumps({'message':'User created successfully !'})
+			#return json.dumps({'message':'User created successfully !'})
+			return redirect('/userHome')
 		else:
 			return json.dumps({'error':str(data[0])})
     else:
 		return json.dumps({'html':'<span>Enter the required fields</span>'})
+
+@app.route('/showSignin')
+def showSignin():
+    return render_template('signin.html')
+
+@app.route('/validateLogin',methods=['POST'])
+def validateLogin():
+    try:
+        _phone = request.form['inputPhone']
+        _password = request.form['inputPassword']
+
+
+        # connect to mysql
+ 
+        con = mysql.connect()
+        cursor = con.cursor()
+        cursor.callproc('sp_validateLogin',(_phone,))
+        data = cursor.fetchall()
+
+        if len(data) > 0:
+            if str(data[0][5]) == str(_password):
+                session['user'] = data[0][2]
+                return redirect('/userHome')
+            else:
+                return render_template('error.html',error = 'Wrong Phone Number or Password.')
+        else:
+            return render_template('error.html',error = 'Wrong Phone Number or Password.')
+ 
+    except Exception as e:
+        return render_template('error.html',error = str(e))
+    finally:
+        cursor.close()
+        con.close()
+
+@app.route('/userHome')
+def userHome():
+    if session.get('user'):
+        return render_template('userHome.html')
+    else:
+        return render_template('error.html',error = 'Unauthorized Access')
+
+@app.route('/logout')
+def logout():
+    session.pop('user',None)
+    return redirect('/')
+
+@app.route('/myMenu')
+def menu():
+    if session.get('user'):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        thisId = session['user']
+        query = ("SELECT * FROM food WHERE vendor_id=1")
+        cursor.execute(query)
+        fields=cursor.fetchall()
+        return render_template('menu.html',fields=fields)
+    else:
+        return render_template('error.html',error = 'Unauthorized Access')
+
+@app.route('/editMenu')
+def menuChange():
+	if session.get('user'):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        thisId = session['user']
+        query = ("SELECT * FROM food WHERE vendor_id=1")
+        cursor.execute(query)
+        fields=cursor.fetchall()
+        return render_template('editMenu.html',fields=fields)
+    else:
+        return render_template('error.html',error = 'Unauthorized Access')
+
 
