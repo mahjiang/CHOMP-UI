@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>CHOMP</title>
+ 
+ 
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+ 
+ 
+</head>
+ 
+<body>
+ 
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">CHOMP</h3>
+        </div>
+        <h1>Edit Menu</h1>
+        <form method="post" action="/saveMenu">
+        <table border="1" class="table table-hover"><tr><th>Food Item</th><th>Price</th></tr>
+        {% for field in fields %}
+        <tr>
+            <td><INPUT TYPE="TEXT" NAME="name" SIZE="20">{{ field[1] }}</td>
+            <td>${{ field[2] }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+        </form>
+ 
+        <footer class="footer">
+            <p>&copy; CHOMP 2016</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>
